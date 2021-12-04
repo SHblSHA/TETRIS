@@ -47,9 +47,10 @@ void decMap()
 			for (int z = h; z > 0; --z)
 				for (int w = 0; w < 18; ++w)
 				{
-					if (map[z][w] > 0)
+					int i = 1;
+					while(i < 26 - z)
 					{
-						map[z][w] = Color::CLEAR;
+						if (map[z + 1][w] == 0) ++i;
 						map[z][w] = map[z - 1][w];
 					}
 				}

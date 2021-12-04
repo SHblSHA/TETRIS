@@ -42,13 +42,19 @@ public:
 	void spawn()
 	{
 		type = getRandomNumber(0, 6);
-		spawnX = getRandomNumber(0, 16);
+		spawnX = 16;//getRandomNumber(0, 16);
 		color = static_cast<Color>(getRandomNumber(1, 7));
 
 		for (int i = 0; i < 4; ++i)
 		{
 			point[i].x = (tetramino[type][i] % 2 + spawnX) * size;
 			point[i].y = (tetramino[type][i] / 2 + spawnY) * size;
+		}
+
+		if (getRandomNumber(0, 1))
+		{
+			rotation();
+			interactionMap();
 		}
 	}
 
@@ -160,6 +166,18 @@ public:
 				spawn();
 				break;
 			}
+
+			if (point[z].x < 0)
+			{
+				for (int i = 0; i < 4; ++i)
+					point[i].x += 18;
+			}
+
+			if (point[z].x > 306)
+			{
+				for (int i = 0; i < 4; ++i)
+					point[i].x -= 18;
+			}
 		}
 	}
 
@@ -211,7 +229,7 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	rand();
 
-	ShowWindow(GetConsoleWindow(), SW_NORMAL);
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
 
 	int h = 486;
 	int w = 324;
@@ -310,21 +328,9 @@ int main()
 
 					if (event.key.code == sf::Keyboard::Up)
 					{
+						tetramino.setDir(Dir::DEFAULT);
 						tetramino.rotation();
-						for (int i = 0; i < 4; ++i)
-						{
-							if (tetramino.getPoint(i).x < 0)
-							{
-								for (int z = 0; z < 4; ++z)
-									tetramino.setPoint(z).x += 18;
-							}
-
-							if (tetramino.getPoint(i).x > 306)
-							{
-								for (int z = 0; z < 4; ++z)
-									tetramino.setPoint(z).x -= 18;
-							}
-						}
+						tetramino.interactionMap();
 					}
 
 					if (event.key.code == sf::Keyboard::Left)
