@@ -165,6 +165,17 @@ public:
 		}
 	}
 
+	void rotation()
+	{
+		for (int i = 0; i < num; ++i)
+		{
+			int x = point[i].y - point[1].y;
+			int y = point[i].x - point[1].x;
+			point[i].x = point[1].x - x;
+			point[i].y = point[1].y + y;
+		}
+	}
+
 	void setDir(Dir&& dir)
 	{
 		m_dir = dir;
@@ -218,13 +229,14 @@ int main()
 	backGround.setScale(0.45f, 0.48f);
 
 	Tetramino tetramino;
+	tetramino.spawn();
+
 	sf::Texture t;
 	t.loadFromFile("resources/tiles.png");
 	sf::Sprite spr_tetramino(t);
 
 	sf::Sprite spr_map(t);
 
-	bool bool_tetramino = 1;
 	bool keyPressed = 0;
 
 	sf::Clock clock;
@@ -255,7 +267,7 @@ int main()
 				{	
 					for (int i = 0; i < 4; ++i)
 					{
-						if (map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0)
+						if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0) || (tetramino.getPoint(i).x / 18 == 17))
 						{
 							tetramino.setDir(Dir::DEFAULT);
 							break;
@@ -283,14 +295,14 @@ int main()
 
 				if (event.key.code == sf::Keyboard::Up)
 				{
-					
+					tetramino.rotation();
 				}
 
 				if (event.key.code == sf::Keyboard::Left)
 				{
 					for (int i = 0; i < 4; ++i)
 					{
-						if (map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0)
+						if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0) || (tetramino.getPoint(i).x / 18 == 0))
 						{
 							tetramino.setDir(Dir::DEFAULT);
 							break;
@@ -330,12 +342,6 @@ int main()
 			window.draw(lineX);
 		}
 
-		if (bool_tetramino)
-		{
-			tetramino.spawn();
-			bool_tetramino = false;
-		}
-
 		if (tetramino.getDir() != Dir::DOWN)
 		{
 			delay += time;
@@ -347,6 +353,8 @@ int main()
 		}
 
 		tetramino.interactionMap();
+
+		decMap();
 
 		tetramino.draw(window, spr_map);
 

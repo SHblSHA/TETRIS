@@ -14,6 +14,33 @@ enum Color
 
 int map[26][18] = { Color::CLEAR };
 
+void decMap()
+{
+	int count = 0;
+	for (int h = 26; h > 0; --h)
+	{
+		for (int w = 0; w < 18; ++w)
+		{
+			if (map[h][w] > 0) ++count;
+		}
+
+		if (count == 18)
+		{
+			for (int z = h; z > 0; --z)
+				for (int w = 0; w < 18; ++w)
+				{
+					if (map[z][w] > 0)
+					{
+						map[z][w] = Color::CLEAR;
+						map[z][w] = map[z - 1][w];
+					}
+				}
+		}
+
+		count = 0;
+	}
+}
+
 void drawMap(sf::RenderWindow& window, sf::Sprite& spr_map)
 {
 	int size = 18;
