@@ -1,15 +1,19 @@
-////////////////////////////////////////////////////////////
+Ôªø////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <ctime>
-#include <cstdlib>
-#include <vector>
 #include <cassert>
-#include <array>
 #include <iostream>
-#include <utility>
+#include "map.h"
+#include <array>
+
+int getRandomNumber(int min, int max)
+{
+	static const double fraction = 1.0 / (static_cast<double>(RAND_MAX) + 1.0);
+	return static_cast<int>(rand() * fraction * (max - min + 1) + min);
+}
 
 class Point
 {
@@ -18,36 +22,162 @@ public:
 	int y;
 };
 
+enum Dir
+{
+	LEFT,
+	RIGHT,
+	DOWN,
+	DEFAULT,
+};
+
 class Tetramino
 {
 private:
-	Point point[4];
+	static const int num = 4;
+	static const int size = 18;
+	Point point[num];
 	static std::array<std::array<int, 4>, 7> tetramino;
-	int type;
+	int type, spawnX, spawnY = -4;
+	Color color;
+	Dir m_dir;
 public:
-	Tetramino()
+	void spawn()
 	{
-		spawn();
-	}
+		type = getRandomNumber(0, 6);
+		spawnX = getRandomNumber(0, 16);
+		color = static_cast<Color>(getRandomNumber(1, 7));
 
-	Tetramino(int x)
-	{
-		spawn(x);
-	}
-
-	void spawn(int x = 0)
-	{
-		int type = 5; // Á‡‰‡ÂÏ ÚËÔ ÚÂÚ‡ÏËÌÓ
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; ++i)
 		{
-			point[i].x = tetramino[type][i] % 2 + x;
-			point[i].y = tetramino[type][i] / 2;
+			point[i].x = (tetramino[type][i] % 2 + spawnX) * size;
+			point[i].y = (tetramino[type][i] / 2 + spawnY) * size;
 		}
 	}
 
-	const Point* getPoint()
+	void draw(sf::RenderWindow& window, sf::Sprite& spr_tetramino)
 	{
-		return point;
+		for (int i = 0; i < 4; ++i)
+		{
+			switch (color)
+			{
+				case CYAN:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(0, 0, size, size));
+				}break;
+
+				case MAGENTA:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size, 0, size, size));
+				}break;
+
+				case RED:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size * 2, 0, size, size));
+				}break;
+
+				case GREEN:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size * 3, 0, size, size));
+				}break;
+
+				case YELLOW:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size * 4, 0, size, size));
+				}break;
+
+				case BLUE:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size * 5, 0, size, size));
+				}break;
+
+				case ORANGE:
+				{
+					spr_tetramino.setTextureRect(sf::IntRect(size * 6, 0, size, size));
+				}break;
+			}
+
+			spr_tetramino.setPosition(point[i].x, point[i].y);
+			window.draw(spr_tetramino);
+		}
+	}
+
+	void move(bool i = 0)
+	{
+		if (!i || m_dir == Dir::DEFAULT)
+		{
+			for (int i = 0; i < num; ++i)
+			{
+				point[i].y += 18;
+			}
+		}
+
+		else
+		{
+			switch (m_dir)
+			{
+				case LEFT:
+				{
+					for (int i = 0; i < num; ++i)
+					{
+						point[i].x -= 18;
+					}
+				}break;
+
+				case RIGHT:
+				{
+					for (int i = 0; i < num; ++i)
+					{
+						point[i].x += 18;
+					}
+				}break;
+
+				case DOWN:
+				{
+					for (int i = 0; i < num; ++i)
+					{
+						point[i].y += 18;
+					}
+				}break;
+			}
+		}
+	}
+
+	void interactionMap()
+	{
+		for (int z = 0; z < num; ++z)
+		{
+			if (point[z].y == 468)
+			{
+				for (int i = 0; i < num; ++i)
+					map[point[i].y / size][point[i].x / size] = color;
+				spawn();
+				break;
+			}
+			
+			if (map[point[z].y / size + 1][point[z].x / size] > 0)
+			{
+				for (int i = 0; i < num; ++i)
+					map[point[i].y / size][point[i].x / size] = color;
+			
+				spawn();
+				break;
+			}
+		}
+	}
+
+	void setDir(Dir&& dir)
+	{
+		m_dir = dir;
+	}
+
+	const Dir& getDir()
+	{
+		return m_dir;
+	}
+
+	const Point getPoint(int i)
+	{
+		return point[i];
 	}
 };
 
@@ -62,40 +192,130 @@ std::array<std::array<int, 4>, 7> Tetramino::tetramino =
 	2,3,4,5,
 };
 
-/////////////////////////////////ÔÓ‚ÓÓÚ ÚÂÚ‡ÏËÌÓ x2 = x0 + (y0 - y1)  y2 = y0 - (x1 - x2)
+//—Å–¥–µ–ª–∞—Ç—å –ø–æ–∫–∞–∑ —Ç–µ—Ç—Ä–∞–º–∏–Ω–æ –Ω–∞ –∫–∞—Ä—Ç–µ
+
+/////////////////////////////////√Ø√Æ√¢√Æ√∞√Æ√≤ √≤√•√≤√∞√†√¨√®√≠√Æ x2 = x0 + (y0 - y1)  y2 = y0 - (x1 - x2)
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(324, 486), "TETRIS");
+	srand(static_cast<unsigned int>(time(0)));
+	rand();
 
-	sf::RectangleShape lineY(sf::Vector2f(486.f, 0.5f));
+	int h = 486;
+	int w = 324;
+
+	sf::RenderWindow window(sf::VideoMode(w, h), "TETRIS");
+
+	sf::RectangleShape lineY(sf::Vector2f(h, 0.5f));
 	lineY.setFillColor(sf::Color::Black);
 	lineY.setRotation(90);
 
-	sf::RectangleShape lineX(sf::Vector2f(324.f, 0.5f));
+	sf::RectangleShape lineX(sf::Vector2f(w, 0.5f));
 	lineX.setFillColor(sf::Color::Black);
 
-	sf::Texture map;
-	map.loadFromFile("resources/TufboJ.jpg ");
-	sf::Sprite backGround(map);
-	backGround.setScale(0.42f, 0.47f);
+	sf::Texture backGroundTexture;
+	backGroundTexture.loadFromFile("resources/TufboJ.jpg ");
+	sf::Sprite backGround(backGroundTexture);
+	backGround.setScale(0.45f, 0.48f);
 
-	std::vector<Tetramino> tetramino;
+	Tetramino tetramino;
 	sf::Texture t;
-	t.loadFromFile("resources/2.png");
+	t.loadFromFile("resources/tiles.png");
 	sf::Sprite spr_tetramino(t);
 
-	bool b = 1;
+	sf::Sprite spr_map(t);
+
+	bool bool_tetramino = 1;
+	bool keyPressed = 0;
+
+	sf::Clock clock;
+
+	float delay = 0;
+	float timerMove = 0;
+
+	int size = 18;
 
 	while (window.isOpen())
 	{
+		float time = clock.getElapsedTime().asMicroseconds();
+		clock.restart();
+		time /= 800;
+
 		sf::Event event;
+
+		timerMove += time;
+
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 				window.close();
-		}
 
-		//=======================Œ“–»—Œ¬ ¿  ¿–“€===============================
+			if (event.type == sf::Event::KeyPressed)
+			{
+				if (event.key.code == sf::Keyboard::Right)
+				{	
+					for (int i = 0; i < 4; ++i)
+					{
+						if (map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0)
+						{
+							tetramino.setDir(Dir::DEFAULT);
+							break;
+						}
+						else
+							tetramino.setDir(Dir::RIGHT);
+					}
+
+					if (timerMove > 100)
+					{
+						tetramino.move(true);
+						timerMove = 0;
+					}
+				}
+
+				if (event.key.code == sf::Keyboard::Down)
+				{
+					tetramino.setDir(Dir::DOWN);
+					if (timerMove > 25)
+					{
+						tetramino.move(true);
+						timerMove = 0;
+					}
+				}
+
+				if (event.key.code == sf::Keyboard::Up)
+				{
+					
+				}
+
+				if (event.key.code == sf::Keyboard::Left)
+				{
+					for (int i = 0; i < 4; ++i)
+					{
+						if (map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0)
+						{
+							tetramino.setDir(Dir::DEFAULT);
+							break;
+						}
+						else
+							tetramino.setDir(Dir::LEFT);
+					}
+
+					if (timerMove > 100)
+					{
+						tetramino.move(true);
+						timerMove = 0;
+					}
+				}
+			}
+
+			if (event.type == sf::Event::KeyReleased)
+			{
+				if(event.key.code == sf::Keyboard::Down)
+				{
+					tetramino.setDir(Dir::DEFAULT);
+				}
+			}
+		}
+		//=======================√é√í√ê√à√ë√é√Ç√ä√Ä √ä√Ä√ê√í√õ===============================
 		window.draw(backGround);
 
 		for (int i = 1; i < 18; ++i)
@@ -110,25 +330,29 @@ int main()
 			window.draw(lineX);
 		}
 
-		if (b)
+		if (bool_tetramino)
 		{
-			tetramino.push_back(Tetramino());
-			tetramino.push_back(Tetramino(2));
-			b = false;
+			tetramino.spawn();
+			bool_tetramino = false;
 		}
 
-		///////////ÓÚËÒÓ‚Í‡ ÚÂÚ‡ÏËÌÓ//////////
-		for (int j = 0; j < tetramino.size(); ++j)
+		if (tetramino.getDir() != Dir::DOWN)
 		{
-			for (int i = 0; i < 4; ++i)
-			{
-				spr_tetramino.setTextureRect(sf::IntRect(0, 0, 18, 18));
-				spr_tetramino.setPosition(tetramino[j].getPoint()[i].x * 18, tetramino[j].getPoint()[i].y * 18);
-				window.draw(spr_tetramino);
-			}
+			delay += time;
 		}
+		if (delay > 500)
+		{
+			tetramino.move();
+			delay = 0;
+		}
+
+		tetramino.interactionMap();
+
+		tetramino.draw(window, spr_map);
+
+		drawMap(window, spr_map);
 
 		window.display();
 	}
+	return 0;
 }
-
