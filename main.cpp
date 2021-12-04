@@ -1,13 +1,11 @@
-﻿////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 #include <cmath>
 #include <ctime>
 #include <cassert>
 #include <iostream>
 #include "map.h"
 #include <array>
+#include <windows.h>
 
 int getRandomNumber(int min, int max)
 {
@@ -203,13 +201,12 @@ std::array<std::array<int, 4>, 7> Tetramino::tetramino =
 	2,3,4,5,
 };
 
-//сделать показ тетрамино на карте
-
-/////////////////////////////////ïîâîðîò òåòðàìèíî x2 = x0 + (y0 - y1)  y2 = y0 - (x1 - x2)
 int main()
 {
 	srand(static_cast<unsigned int>(time(0)));
 	rand();
+
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
 
 	int h = 486;
 	int w = 324;
@@ -327,7 +324,7 @@ int main()
 				}
 			}
 		}
-		//=======================ÎÒÐÈÑÎÂÊÀ ÊÀÐÒÛ===============================
+		
 		window.draw(backGround);
 
 		for (int i = 1; i < 18; ++i)
