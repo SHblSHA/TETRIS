@@ -14,6 +14,24 @@ enum Color
 
 int map[26][18] = { Color::CLEAR };
 
+void resetMap()
+{
+	for (int h = 26; h > 0; --h)
+		for (int w = 0; w < 18; ++w)
+			map[h][w] = Color::CLEAR;
+}
+
+bool isNotAlive()
+{
+	for (int w = 0; w < 18; ++w)
+		if (map[9][w])
+		{
+			return true;
+		}
+
+	return false;
+}
+
 void decMap()
 {
 	int count = 0;

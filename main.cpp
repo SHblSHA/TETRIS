@@ -5,7 +5,7 @@
 #include <iostream>
 #include "map.h"
 #include <array>
-#include <windows.h>
+#include <Windows.h>
 
 int getRandomNumber(int min, int max)
 {
@@ -188,6 +188,11 @@ public:
 	{
 		return point[i];
 	}
+
+	Point& setPoint(int i)
+	{
+		return point[i];
+	}
 };
 
 std::array<std::array<int, 4>, 7> Tetramino::tetramino =
@@ -206,12 +211,20 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	rand();
 
-	ShowWindow(GetConsoleWindow(), SW_HIDE);
+	ShowWindow(GetConsoleWindow(), SW_NORMAL);
 
 	int h = 486;
 	int w = 324;
 
 	sf::RenderWindow window(sf::VideoMode(w, h), "TETRIS");
+
+	sf::Font font;
+	font.loadFromFile("resources/CyrilicOld.TTF");
+	sf::Text text("YOU LOSE", font, 30);
+	text.setFillColor(sf::Color::Red);
+	text.setOutlineThickness(5);
+	text.setOutlineColor(sf::Color::Black);
+	text.setPosition(90, 200);
 
 	sf::RectangleShape lineY(sf::Vector2f(h, 0.5f));
 	lineY.setFillColor(sf::Color::Black);
@@ -219,6 +232,10 @@ int main()
 
 	sf::RectangleShape lineX(sf::Vector2f(w, 0.5f));
 	lineX.setFillColor(sf::Color::Black);
+
+	sf::RectangleShape line(sf::Vector2f(w, 2));
+	line.setFillColor(sf::Color::Red);
+	line.setPosition(0, 18 * 10);
 
 	sf::Texture backGroundTexture;
 	backGroundTexture.loadFromFile("resources/TufboJ.jpg ");
@@ -235,6 +252,7 @@ int main()
 	sf::Sprite spr_map(t);
 
 	bool keyPressed = 0;
+	bool game = 1;
 
 	sf::Clock clock;
 
@@ -245,119 +263,147 @@ int main()
 
 	while (window.isOpen())
 	{
-		float time = clock.getElapsedTime().asMicroseconds();
-		clock.restart();
-		time /= 800;
+			float time = clock.getElapsedTime().asMicroseconds();
+			clock.restart();
+			time /= 800;
 
-		sf::Event event;
+			sf::Event event;
 
-		timerMove += time;
+			timerMove += time;
 
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-
-			if (event.type == sf::Event::KeyPressed)
+			while (window.pollEvent(event))
 			{
-				if (event.key.code == sf::Keyboard::Right)
-				{	
-					for (int i = 0; i < 4; ++i)
+				if (event.type == sf::Event::Closed)
+					window.close();
+
+				if (event.type == sf::Event::KeyPressed && game)
+				{
+					if (event.key.code == sf::Keyboard::Right)
 					{
-						if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0) || (tetramino.getPoint(i).x / 18 == 17))
+						for (int i = 0; i < 4; ++i)
 						{
-							tetramino.setDir(Dir::DEFAULT);
-							break;
+							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0) || (tetramino.getPoint(i).x / 18 == 17))
+							{
+								tetramino.setDir(Dir::DEFAULT);
+								break;
+							}
+							else
+								tetramino.setDir(Dir::RIGHT);
 						}
-						else
-							tetramino.setDir(Dir::RIGHT);
-					}
 
-					if (timerMove > 100)
-					{
-						tetramino.move(true);
-						timerMove = 0;
-					}
-				}
-
-				if (event.key.code == sf::Keyboard::Down)
-				{
-					tetramino.setDir(Dir::DOWN);
-					if (timerMove > 25)
-					{
-						tetramino.move(true);
-						timerMove = 0;
-					}
-				}
-
-				if (event.key.code == sf::Keyboard::Up)
-				{
-					tetramino.rotation();
-				}
-
-				if (event.key.code == sf::Keyboard::Left)
-				{
-					for (int i = 0; i < 4; ++i)
-					{
-						if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0) || (tetramino.getPoint(i).x / 18 == 0))
+						if (timerMove > 100)
 						{
-							tetramino.setDir(Dir::DEFAULT);
-							break;
+							tetramino.move(true);
+							timerMove = 0;
 						}
-						else
-							tetramino.setDir(Dir::LEFT);
 					}
 
-					if (timerMove > 100)
+					if (event.key.code == sf::Keyboard::Down)
 					{
-						tetramino.move(true);
-						timerMove = 0;
+						tetramino.setDir(Dir::DOWN);
+						if (timerMove > 25)
+						{
+							tetramino.move(true);
+							timerMove = 0;
+						}
+					}
+
+					if (event.key.code == sf::Keyboard::Up)
+					{
+						tetramino.rotation();
+						for (int i = 0; i < 4; ++i)
+						{
+							if (tetramino.getPoint(i).x < 0)
+							{
+								for (int z = 0; z < 4; ++z)
+									tetramino.setPoint(z).x += 18;
+							}
+
+							if (tetramino.getPoint(i).x > 306)
+							{
+								for (int z = 0; z < 4; ++z)
+									tetramino.setPoint(z).x -= 18;
+							}
+						}
+					}
+
+					if (event.key.code == sf::Keyboard::Left)
+					{
+						for (int i = 0; i < 4; ++i)
+						{
+							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0) || (tetramino.getPoint(i).x / 18 == 0))
+							{
+								tetramino.setDir(Dir::DEFAULT);
+								break;
+							}
+							else
+								tetramino.setDir(Dir::LEFT);
+						}
+
+						if (timerMove > 100)
+						{
+							tetramino.move(true);
+							timerMove = 0;
+						}
+					}
+				}
+
+				if (event.type == sf::Event::KeyReleased && game)
+				{
+					if (event.key.code == sf::Keyboard::Down)
+					{
+						tetramino.setDir(Dir::DEFAULT);
 					}
 				}
 			}
 
-			if (event.type == sf::Event::KeyReleased)
+			window.draw(backGround);
+
+			for (int i = 1; i < 18; ++i)
 			{
-				if(event.key.code == sf::Keyboard::Down)
+				lineY.setPosition(i * 18, 0);
+				window.draw(lineY);
+			}
+
+			for (int i = 0; i < 27; ++i)
+			{
+				if (i == 10) continue;
+				lineX.setPosition(0, i * 18);
+				window.draw(lineX);
+			}
+
+			window.draw(line);
+
+			if ((tetramino.getDir() != Dir::DOWN) && game)
+			{
+				delay += time;
+			}
+			if (delay > 300)
+			{
+				tetramino.move();
+				delay = 0;
+			}
+
+			tetramino.interactionMap();
+
+			decMap();
+
+			tetramino.draw(window, spr_map);
+
+			drawMap(window, spr_map);
+
+			if (isNotAlive())
+			{
+				game = false;
+				window.draw(text);
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 				{
-					tetramino.setDir(Dir::DEFAULT);
+					game = true;
+					resetMap();
 				}
 			}
-		}
-		
-		window.draw(backGround);
 
-		for (int i = 1; i < 18; ++i)
-		{
-			lineY.setPosition(i * 18, 0);
-			window.draw(lineY);
-		}
-
-		for (int i = 0; i < 27; ++i)
-		{
-			lineX.setPosition(0, i * 18);
-			window.draw(lineX);
-		}
-
-		if (tetramino.getDir() != Dir::DOWN)
-		{
-			delay += time;
-		}
-		if (delay > 500)
-		{
-			tetramino.move();
-			delay = 0;
-		}
-
-		tetramino.interactionMap();
-
-		decMap();
-
-		tetramino.draw(window, spr_map);
-
-		drawMap(window, spr_map);
-
-		window.display();
+			window.display();
 	}
 	return 0;
 }
