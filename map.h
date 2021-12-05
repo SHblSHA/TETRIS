@@ -47,12 +47,7 @@ void decMap()
 			for (int z = h; z > 0; --z)
 				for (int w = 0; w < 18; ++w)
 				{
-					int i = 1;
-					while(i < 26 - z)
-					{
-						if (map[z + 1][w] == 0) ++i;
-						map[z][w] = map[z - 1][w];
-					}
+					map[z][w] = map[z - 1][w];
 				}
 		}
 
