@@ -38,23 +38,34 @@ private:
 	int type, spawnX, spawnY = -4;
 	Color color;
 	Dir m_dir;
+	bool rot;
 public:
 	void spawn()
 	{
 		type = getRandomNumber(0, 6);
-		spawnX = 16;//getRandomNumber(0, 16);
+		rot = static_cast<bool>(getRandomNumber(0, 1));
 		color = static_cast<Color>(getRandomNumber(1, 7));
 
-		for (int i = 0; i < 4; ++i)
+		if (rot)
 		{
-			point[i].x = (tetramino[type][i] % 2 + spawnX) * size;
-			point[i].y = (tetramino[type][i] / 2 + spawnY) * size;
+			spawnY = -1;
+			spawnX = getRandomNumber(0, 14);
+			for (int i = 0; i < 4; ++i)
+			{
+				point[i].x = (tetramino[type][i] % 2 + spawnX + i) * size;
+				point[i].y = (tetramino[type][i] / 2 + spawnY - i) * size;
+			}
 		}
 
-		if (getRandomNumber(0, 1))
-		{
-			rotation();
-			interactionMap();
+		else
+		{ 
+			spawnY = -4;
+			spawnX = getRandomNumber(0, 16); 
+			for (int i = 0; i < 4; ++i)
+			{
+				point[i].x = (tetramino[type][i] % 2 + spawnX) * size;
+				point[i].y = (tetramino[type][i] / 2 + spawnY) * size;
+			}
 		}
 	}
 
@@ -229,7 +240,7 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	rand();
 
-	ShowWindow(GetConsoleWindow(), SW_HIDE);
+	ShowWindow(GetConsoleWindow(), SW_NORMAL);
 
 	int h = 486;
 	int w = 324;
