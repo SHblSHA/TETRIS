@@ -257,7 +257,7 @@ int main()
 	srand(static_cast<unsigned int>(time(0)));
 	rand();
 
-	ShowWindow(GetConsoleWindow(), SW_NORMAL);
+	ShowWindow(GetConsoleWindow(), SW_HIDE);
 
 	int h = 486;
 	int w = 324;
