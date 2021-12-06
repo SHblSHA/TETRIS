@@ -139,7 +139,7 @@ public:
 		{
 			for (int i = 0; i < num; ++i)
 			{
-				point[i].y += 18;
+				point[i].y += size;
 			}
 		}
 
@@ -151,7 +151,7 @@ public:
 				{
 					for (int i = 0; i < num; ++i)
 					{
-						point[i].x -= 18;
+						point[i].x -= size;
 					}
 				}break;
 
@@ -159,7 +159,7 @@ public:
 				{
 					for (int i = 0; i < num; ++i)
 					{
-						point[i].x += 18;
+						point[i].x += size;
 					}
 				}break;
 
@@ -167,7 +167,7 @@ public:
 				{
 					for (int i = 0; i < num; ++i)
 					{
-						point[i].y += 18;
+						point[i].y += size;
 					}
 				}break;
 			}
@@ -198,13 +198,13 @@ public:
 			if (point[z].x < 0)
 			{
 				for (int i = 0; i < 4; ++i)
-					point[i].x += 18;
+					point[i].x += size;
 			}
 
 			if (point[z].x > 306)
 			{
 				for (int i = 0; i < 4; ++i)
-					point[i].x -= 18;
+					point[i].x -= size;
 			}
 		}
 	}
@@ -305,8 +305,6 @@ int main()
 	float delay = 0;
 	float timerMove = 0;
 	float rotateTimer = 0;
-
-	int size = 18;
 
 	while (window.isOpen())
 	{

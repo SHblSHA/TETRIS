@@ -35,7 +35,7 @@ bool isNotAlive()
 void decMap()
 {
 	int count = 0;
-	for (int h = 26; h > 0; --h)
+	for (int h = 26; h > 10; --h)
 	{
 		for (int w = 0; w < 18; ++w)
 		{
@@ -44,7 +44,7 @@ void decMap()
 
 		if (count == 18)
 		{
-			for (int z = h; z > 0; --z)
+			for (int z = h; z > 10; --z)
 				for (int w = 0; w < 18; ++w)
 				{
 					map[z][w] = map[z - 1][w];
@@ -59,7 +59,7 @@ void drawMap(sf::RenderWindow& window, sf::Sprite& spr_map)
 {
 	int size = 18;
 
-	for(int h = 26; h > 0; --h)
+	for(int h = 26; h > 5; --h)
 		for (int w = 0; w < 18; ++w)
 		{
 			switch (map[h][w])
