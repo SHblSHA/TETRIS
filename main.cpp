@@ -50,6 +50,8 @@ public:
 		}
 	}
 
+	
+
 	void spawn()
 	{
 		type = getRandomNumber(0, 6);
@@ -65,7 +67,7 @@ public:
 		}
 
 		else
-		{ 
+		{
 			spawnY = -4;
 			setSpawnCoordinate();
 		}
