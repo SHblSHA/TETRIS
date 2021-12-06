@@ -57,10 +57,22 @@ public:
 		type = getRandomNumber(0, 6);
 		rot = static_cast<bool>(getRandomNumber(0, 1));
 		color = static_cast<Color>(getRandomNumber(1, 7));
-		spawnX = getRandomNumber(0, 16);
 
 		if (rot)
 		{
+			switch (type)
+			{
+			case 0:
+			case 2:
+			case 3:
+			case 5:
+				spawnX = getRandomNumber(0, 15); break;
+			case 4:
+			case 6:
+				spawnX = getRandomNumber(0, 16); break;
+			case 1:
+				spawnX = getRandomNumber(0, 14); break;
+			}
 			spawnY = -3;
 			setSpawnCoordinate();
 			rotation();
@@ -68,6 +80,7 @@ public:
 
 		else
 		{
+			spawnX = getRandomNumber(0, 16);
 			spawnY = -4;
 			setSpawnCoordinate();
 		}
