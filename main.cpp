@@ -25,6 +25,7 @@ enum Dir
 	LEFT,
 	RIGHT,
 	DOWN,
+	DEFAULT,
 };
 
 class Tetramino
@@ -134,8 +135,18 @@ public:
 
 	void move(bool i = 0)
 	{
-		switch (m_dir)
+		if (!i || m_dir == Dir::DEFAULT)
 		{
+			for (int i = 0; i < num; ++i)
+			{
+				point[i].y += 18;
+			}
+		}
+
+		else
+		{
+			switch (m_dir)
+			{
 				case LEFT:
 				{
 					for (int i = 0; i < num; ++i)
@@ -159,7 +170,8 @@ public:
 						point[i].y += 18;
 					}
 				}break;
-		}	
+			}
+		}
 	}
 
 	void interactionMap()
@@ -318,7 +330,7 @@ int main()
 						{
 							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0) || (tetramino.getPoint(i).x / 18 == 17))
 							{
-								tetramino.setDir(Dir::DOWN);
+								tetramino.setDir(Dir::DEFAULT);
 								break;
 							}
 							else
@@ -344,7 +356,7 @@ int main()
 
 					if (event.key.code == sf::Keyboard::Up)
 					{
-						tetramino.setDir(Dir::DOWN);
+						tetramino.setDir(Dir::DEFAULT);
 						tetramino.rotation();
 						tetramino.interactionMap();
 					}
@@ -355,7 +367,7 @@ int main()
 						{
 							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0) || (tetramino.getPoint(i).x / 18 == 0))
 							{
-								tetramino.setDir(Dir::DOWN);
+								tetramino.setDir(Dir::DEFAULT);
 								break;
 							}
 							else
@@ -367,6 +379,14 @@ int main()
 							tetramino.move(true);
 							timerMove = 0;
 						}
+					}
+				}
+
+				if (event.type == sf::Event::KeyReleased && game)
+				{
+					if (event.key.code == sf::Keyboard::Down)
+					{
+						tetramino.setDir(Dir::DEFAULT);
 					}
 				}
 			}
