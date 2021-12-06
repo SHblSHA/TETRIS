@@ -133,9 +133,9 @@ public:
 		}
 	}
 
-	void move(bool i = 0)
+	void move(bool keyPressed = 0)
 	{
-		if (!i || m_dir == Dir::DEFAULT)
+		if (!keyPressed || m_dir == Dir::DEFAULT)
 		{
 			for (int i = 0; i < num; ++i)
 			{
@@ -304,6 +304,7 @@ int main()
 
 	float delay = 0;
 	float timerMove = 0;
+	float rotateTimer = 0;
 
 	int size = 18;
 
@@ -316,6 +317,7 @@ int main()
 			sf::Event event;
 
 			timerMove += time;
+			rotateTimer += time;
 
 			while (window.pollEvent(event))
 			{
@@ -354,11 +356,11 @@ int main()
 						}
 					}
 
-					if (event.key.code == sf::Keyboard::Up)
+					if (event.key.code == sf::Keyboard::Up && rotateTimer > 200)
 					{
 						tetramino.setDir(Dir::DEFAULT);
 						tetramino.rotation();
-						tetramino.interactionMap();
+						rotateTimer = 0;
 					}
 
 					if (event.key.code == sf::Keyboard::Left)
