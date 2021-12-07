@@ -50,8 +50,6 @@ public:
 		}
 	}
 
-	
-
 	void spawn()
 	{
 		type = getRandomNumber(0, 6);
@@ -194,18 +192,6 @@ public:
 				spawn();
 				break;
 			}
-
-			if (point[z].x < 0)
-			{
-				for (int i = 0; i < 4; ++i)
-					point[i].x += size;
-			}
-
-			if (point[z].x > 306)
-			{
-				for (int i = 0; i < 4; ++i)
-					point[i].x -= size;
-			}
 		}
 	}
 
@@ -333,9 +319,8 @@ int main()
 								tetramino.setDir(Dir::DEFAULT);
 								break;
 							}
-							else
-								tetramino.setDir(Dir::RIGHT);
-						}
+
+							tetramino.setDir(Dir::RIGHT);
 
 						if (timerMove > 100)
 						{
