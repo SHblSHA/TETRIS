@@ -90,40 +90,40 @@ public:
 		{
 			switch (color)
 			{
-				case CYAN:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(0, 0, size, size));
-				}break;
+			case CYAN:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(0, 0, size, size));
+			}break;
 
-				case MAGENTA:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size, 0, size, size));
-				}break;
+			case MAGENTA:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size, 0, size, size));
+			}break;
 
-				case RED:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size * 2, 0, size, size));
-				}break;
+			case RED:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size * 2, 0, size, size));
+			}break;
 
-				case GREEN:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size * 3, 0, size, size));
-				}break;
+			case GREEN:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size * 3, 0, size, size));
+			}break;
 
-				case YELLOW:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size * 4, 0, size, size));
-				}break;
+			case YELLOW:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size * 4, 0, size, size));
+			}break;
 
-				case BLUE:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size * 5, 0, size, size));
-				}break;
+			case BLUE:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size * 5, 0, size, size));
+			}break;
 
-				case ORANGE:
-				{
-					spr_tetramino.setTextureRect(sf::IntRect(size * 6, 0, size, size));
-				}break;
+			case ORANGE:
+			{
+				spr_tetramino.setTextureRect(sf::IntRect(size * 6, 0, size, size));
+			}break;
 			}
 
 			spr_tetramino.setPosition(point[i].x, point[i].y);
@@ -131,44 +131,34 @@ public:
 		}
 	}
 
-	void move(bool keyPressed = 0)
+	void move()
 	{
-		if (!keyPressed || m_dir == Dir::DEFAULT)
+		switch (m_dir)
+		{
+		case LEFT:
+		{
+			for (int i = 0; i < num; ++i)
+			{
+				point[i].x -= size;
+			}
+		}break;
+
+		case RIGHT:
+		{
+			for (int i = 0; i < num; ++i)
+			{
+				point[i].x += size;
+			}
+		}break;
+
+		case DEFAULT:
+		case DOWN:
 		{
 			for (int i = 0; i < num; ++i)
 			{
 				point[i].y += size;
 			}
-		}
-
-		else
-		{
-			switch (m_dir)
-			{
-				case LEFT:
-				{
-					for (int i = 0; i < num; ++i)
-					{
-						point[i].x -= size;
-					}
-				}break;
-
-				case RIGHT:
-				{
-					for (int i = 0; i < num; ++i)
-					{
-						point[i].x += size;
-					}
-				}break;
-
-				case DOWN:
-				{
-					for (int i = 0; i < num; ++i)
-					{
-						point[i].y += size;
-					}
-				}break;
-			}
+		}break;
 		}
 	}
 
@@ -181,16 +171,34 @@ public:
 				for (int i = 0; i < num; ++i)
 					map[point[i].y / size][point[i].x / size] = color;
 				spawn();
-				break;
+				return;
 			}
-			
+
 			if (map[point[z].y / size + 1][point[z].x / size] > 0)
 			{
 				for (int i = 0; i < num; ++i)
 					map[point[i].y / size][point[i].x / size] = color;
-			
+
 				spawn();
+				return;
+			}
+
+			if (((map[point[z].y / size][point[z].x / size + 1] || point[z].x / size == 17) && m_dir == Dir::RIGHT) || ((map[point[z].y / size][point[z].x / size - 1] || point[z].x / size == 0) && m_dir == Dir::LEFT))
+			{
+				m_dir = Dir::DEFAULT;
 				break;
+			}
+
+			if (point[z].x < 0)
+			{
+				for (int i = 0; i < num; ++i)
+					point[i].x += size;
+			}
+
+			if (point[z].x > 306)
+			{
+				for (int i = 0; i < num; ++i)
+					point[i].x -= size;
 			}
 		}
 	}
@@ -214,16 +222,6 @@ public:
 	const Dir& getDir()
 	{
 		return m_dir;
-	}
-
-	const Point getPoint(int i)
-	{
-		return point[i];
-	}
-
-	Point& setPoint(int i)
-	{
-		return point[i];
 	}
 };
 
@@ -294,50 +292,36 @@ int main()
 
 	while (window.isOpen())
 	{
-			float time = clock.getElapsedTime().asMicroseconds();
-			clock.restart();
-			time /= 800;
+		float time = clock.getElapsedTime().asMicroseconds();
+		clock.restart();
+		time /= 800;
 
-			sf::Event event;
+		sf::Event event;
 
-			timerMove += time;
-			rotateTimer += time;
+		timerMove += time;
+		rotateTimer += time;
 
-			while (window.pollEvent(event))
+		while (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+				window.close();
+			if (game)
 			{
-				if (event.type == sf::Event::Closed)
-					window.close();
-
-				if (event.type == sf::Event::KeyPressed && game)
+				if (event.type == sf::Event::KeyPressed)
 				{
-					if (event.key.code == sf::Keyboard::Right)
+					if ((event.key.code == sf::Keyboard::Right) && timerMove > 100)
 					{
-						for (int i = 0; i < 4; ++i)
-						{
-							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 + 1] > 0) || (tetramino.getPoint(i).x / 18 == 17))
-							{
-								tetramino.setDir(Dir::DEFAULT);
-								break;
-							}
-
-							tetramino.setDir(Dir::RIGHT);
-
-							if (timerMove > 100)
-							{
-								tetramino.move(true);
-								timerMove = 0;
-							}
-						}
+						tetramino.setDir(Dir::RIGHT);
+						tetramino.interactionMap();
+						tetramino.move();
+						timerMove = 0;
 					}
 
-					if (event.key.code == sf::Keyboard::Down)
+					if ((event.key.code == sf::Keyboard::Down) && timerMove > 25)
 					{
 						tetramino.setDir(Dir::DOWN);
-						if (timerMove > 25)
-						{
-							tetramino.move(true);
-							timerMove = 0;
-						}
+						tetramino.move();
+						timerMove = 0;
 					}
 
 					if (event.key.code == sf::Keyboard::Up && rotateTimer > 200)
@@ -347,28 +331,16 @@ int main()
 						rotateTimer = 0;
 					}
 
-					if (event.key.code == sf::Keyboard::Left)
+					if ((event.key.code == sf::Keyboard::Left) && timerMove > 100)
 					{
-						for (int i = 0; i < 4; ++i)
-						{
-							if ((map[tetramino.getPoint(i).y / 18][tetramino.getPoint(i).x / 18 - 1] > 0) || (tetramino.getPoint(i).x / 18 == 0))
-							{
-								tetramino.setDir(Dir::DEFAULT);
-								break;
-							}
-							else
-								tetramino.setDir(Dir::LEFT);
-						}
-
-						if (timerMove > 100)
-						{
-							tetramino.move(true);
-							timerMove = 0;
-						}
+						tetramino.setDir(Dir::LEFT);
+						tetramino.interactionMap();
+						tetramino.move();
+						timerMove = 0;
 					}
 				}
 
-				if (event.type == sf::Event::KeyReleased && game)
+				if (event.type == sf::Event::KeyReleased)
 				{
 					if (event.key.code == sf::Keyboard::Down)
 					{
@@ -376,55 +348,54 @@ int main()
 					}
 				}
 			}
-		
-			window.draw(backGround);
+		}
 
-			for (int i = 1; i < 18; ++i)
+		window.draw(backGround);
+
+		for (int i = 1; i < 18; ++i)
+		{
+			lineY.setPosition(i * 18, 0);
+			window.draw(lineY);
+		}
+
+		for (int i = 0; i < 27; ++i)
+		{
+			if (i == 10) continue;
+			lineX.setPosition(0, i * 18);
+			window.draw(lineX);
+		}
+
+		window.draw(line);
+
+		if ((tetramino.getDir() != Dir::DOWN) && game)
+		{
+			delay += time;
+		}
+		if (delay > 300)
+		{
+			tetramino.setDir(Dir::DEFAULT);
+			tetramino.move();
+			delay = 0;
+		}
+
+		tetramino.interactionMap();
+		tetramino.draw(window, spr_map);
+
+		decMap();
+		drawMap(window, spr_map);
+
+		if (isNotAlive())
+		{
+			game = false;
+			window.draw(text);
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
 			{
-				lineY.setPosition(i * 18, 0);
-				window.draw(lineY);
+				game = true;
+				resetMap();
 			}
+		}
 
-			for (int i = 0; i < 27; ++i)
-			{
-				if (i == 10) continue;
-				lineX.setPosition(0, i * 18);
-				window.draw(lineX);
-			}
-
-			window.draw(line);
-
-			if ((tetramino.getDir() != Dir::DOWN) && game)
-			{
-				delay += time;
-			}
-			if (delay > 300)
-			{
-				tetramino.move();
-				delay = 0;
-			}
-
-			tetramino.interactionMap();
-
-			decMap();
-
-			tetramino.draw(window, spr_map);
-
-
-			drawMap(window, spr_map);
-
-			if (isNotAlive())
-			{
-				game = false;
-				window.draw(text);
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-				{
-					game = true;
-					resetMap();
-				}
-			}
-
-			window.display();
+		window.display();
 	}
 	return 0;
 }
