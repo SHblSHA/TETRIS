@@ -322,10 +322,11 @@ int main()
 
 							tetramino.setDir(Dir::RIGHT);
 
-						if (timerMove > 100)
-						{
-							tetramino.move(true);
-							timerMove = 0;
+							if (timerMove > 100)
+							{
+								tetramino.move(true);
+								timerMove = 0;
+							}
 						}
 					}
 
@@ -375,7 +376,7 @@ int main()
 					}
 				}
 			}
-
+		
 			window.draw(backGround);
 
 			for (int i = 1; i < 18; ++i)
