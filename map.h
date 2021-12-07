@@ -35,7 +35,7 @@ bool isNotAlive()
 void decMap()
 {
 	int count = 0;
-	for (int h = 26; h > 10; --h)
+	for (int h = 26; h > 9; --h)
 	{
 		for (int w = 0; w < 18; ++w)
 		{
@@ -44,10 +44,13 @@ void decMap()
 
 		if (count == 18)
 		{
-			for (int z = h; z > 10; --z)
+			for (int z = h; z > 9; --z)
 				for (int w = 0; w < 18; ++w)
 				{
-					map[z][w] = map[z - 1][w];
+					map[z][w] = CLEAR;
+
+					if(map[z - 1][w])
+						map[z][w] = map[z - 1][w];
 				}
 		}
 

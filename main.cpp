@@ -424,6 +424,7 @@ int main()
 
 			tetramino.draw(window, spr_map);
 
+
 			drawMap(window, spr_map);
 
 			if (isNotAlive())
