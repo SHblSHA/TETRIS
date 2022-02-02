@@ -368,6 +368,8 @@ copy /Y "$(SolutionDir)resources"  "$(TargetDir)resources\"</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="map.cpp" />
+    <ClCompile Include="Tetramino.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="extlibs\bin\x64\openal32.dll" />
@@ -485,6 +487,7 @@ copy /Y "$(SolutionDir)resources"  "$(TargetDir)resources\"</Command>
     <Library Include="extlibs\lib\x86\vorbisfile.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="const.h" />
     <ClInclude Include="extlibs\include\SFML\Audio.hpp" />
     <ClInclude Include="extlibs\include\SFML\Audio\AlResource.hpp" />
     <ClInclude Include="extlibs\include\SFML\Audio\Export.hpp" />
@@ -584,6 +587,7 @@ copy /Y "$(SolutionDir)resources"  "$(TargetDir)resources\"</Command>
     <ClInclude Include="extlibs\include\SFML\Window\WindowHandle.hpp" />
     <ClInclude Include="extlibs\include\SFML\Window\WindowStyle.hpp" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="Tetramino.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\ball.wav" />
